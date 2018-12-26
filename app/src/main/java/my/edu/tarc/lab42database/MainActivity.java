@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,7 +58,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Add the functionality to swipe items in the
+        // recycler view to delete that item
+        ItemTouchHelper helper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0,
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView,
+                                          RecyclerView.ViewHolder viewHolder,
+                                          RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                                         int direction) {
+                        int position = viewHolder.getAdapterPosition();
+                        User user = UserAdapter.getUserAtPosition(position);
+                        Toast.makeText(MainActivity.this, "Deleting " +
+                                user.getFirstName(), Toast.LENGTH_LONG).show();
+
+                        // Delete the word
+                        userViewModel.deleteUser(user);
+                    }
+                });
+
+        helper.attachToRecyclerView(recyclerView);
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -82,13 +110,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == INSERT_USER_REQUEST && resultCode == RESULT_OK){
+        if (requestCode == INSERT_USER_REQUEST && resultCode == RESULT_OK) {
             User user = new User();
             user.setFirstName(data.getStringExtra(InsertActivity.INSERT_FIRST));
             user.setLastName(data.getStringExtra(InsertActivity.INSERT_LAST));
             user.setPhone(data.getStringExtra(InsertActivity.INSERT_PHONE));
             userViewModel.insertUser(user);
-        }else{
+        } else {
             Toast.makeText(
                     getApplicationContext(),
                     R.string.empty_not_saved,

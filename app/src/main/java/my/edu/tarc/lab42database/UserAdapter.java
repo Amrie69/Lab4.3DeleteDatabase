@@ -24,7 +24,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     }
 
     private final LayoutInflater layoutInflater;
-    private List<User> userList; //Cached copy of users
+    private static List<User> userList; //Cached copy of users
 
     public UserAdapter(Context context) {
         layoutInflater = LayoutInflater.from(context);
@@ -61,5 +61,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void setUsers(List<User> users){
         userList = users;
         notifyDataSetChanged();
+    }
+
+    public static User getUserAtPosition (int position) {
+        return userList.get(position);
     }
 }
